@@ -42,7 +42,12 @@ class motion_executioner(Node):
         
         # TODO Part 3: Create a publisher to send velocity commands by setting the proper parameters in (...)
         self.vel_publisher=self.create_publisher(Twist, '/cmd_vel', 10)
-                
+
+        # initialize lists
+        self.odom_list = []
+        self.imu_list = []
+        self.laser_list = []
+
         # loggers
         self.imu_logger=Logger('imu_content_'+str(motion_types[motion_type])+'.csv', headers=["acc_x", "acc_y", "angular_z", "stamp"])
         self.odom_logger=Logger('odom_content_'+str(motion_types[motion_type])+'.csv', headers=["x","y","th", "stamp"])
@@ -73,27 +78,32 @@ class motion_executioner(Node):
 
     def imu_callback(self, imu_msg: Imu):
         ...    # log imu msgs
-        # timestamp = Time.from_msg(imu_msg.header.stamp).nanoseconds
+        timestamp = Time.from_msg(imu_msg.header.stamp).nanoseconds
+        imu_acc_x = imu_msg.linear_acceleration.x
+        imu_acc_y = imu_msg.linear_acceleration.y
+        imu_angular_z = imu_msg.angular_velocity.z
+
+        self.imu_logger.log_values([imu_acc_x, imu_acc_y, imu_angular_z, timestamp])
 
         
     def odom_callback(self, odom_msg: Odometry):
         ... # log odom msgs
-        # timestamp = Time.from_msg(odom_msg.header.stamp).nanoseconds # timestamp from message header
+        timestamp = Time.from_msg(odom_msg.header.stamp).nanoseconds # timestamp from message header
+        odom_x_pos = odom_msg.pose.pose.position.x
+        odom_y_pos = odom_msg.pose.pose.position.y
+        # convert q to euler before logging and publishing
+        odom_orientation = odom_msg.pose.pose.orientation
 
-        # # Get message data
-        # odom_orientation = odom_msg.pose.pose.orientation
-        # odom_x_pos = odom_msg.pose.pose.position.x
-        # odom_y_pos = odom_msg.pose.pose.position.y   
-
-        # print(f'Message Timestamp = {timestamp}')   
-        # print(f'Current Robot Orientation = {odom_orientation}')   
-        # print(f'Current Robot X Position = {odom_x_pos}')
-        # print(f'Current Robot Y Position = {odom_y_pos}')
- 
+        self.odom_logger.log_values([odom_x_pos, odom_y_pos, odom_orientation, timestamp])
                 
     def laser_callback(self, laser_msg: LaserScan):
-        
         ... # log laser msgs with position msg at that time
+        timestamp = Time.from_msg(laser_msg.header.stamp).nanoseconds # timestamp from message header
+        laser_range = laser_msg.ranges
+        laser_angle_increment = laser_msg.angle_increment
+
+        # showing inf for some columns, debug later
+        self.laser_logger.log_values([laser_range, laser_angle_increment, timestamp])
                 
     def timer_callback(self):
         
