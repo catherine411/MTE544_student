@@ -84,6 +84,11 @@ class motion_executioner(Node):
 
         self.imu_logger.log_values([imu_acc_x, imu_acc_y, imu_angular_z, timestamp])
 
+        print(f'\nIMU Message Timestamp = {timestamp}')   
+        print(f'Angular velocity = {imu_angular_z}')   
+        print(f'X Acceleration = {imu_acc_x}')
+        print(f'Y Acceleration = {imu_acc_y}')
+
         self.imu_initialized=True
 
         
@@ -96,6 +101,11 @@ class motion_executioner(Node):
 
         self.odom_logger.log_values([odom_x_pos, odom_y_pos, odom_orientation, timestamp])
 
+        print(f'\nOdom Message Timestamp = {timestamp}')   
+        print(f'Current Robot Orientation = {odom_orientation}')   
+        print(f'Current Robot X Position = {odom_x_pos}')
+        print(f'Current Robot Y Position = {odom_y_pos}')
+
         self.odom_initialized=True
                 
     def laser_callback(self, laser_msg: LaserScan):
@@ -104,6 +114,10 @@ class motion_executioner(Node):
         laser_range = laser_msg.ranges
         laser_angle_increment = laser_msg.angle_increment
         self.laser_logger.log_values([laser_range, laser_angle_increment, timestamp])
+
+        print(f'\nLaserScan Message Timestamp = {timestamp}')   
+        print(f'Range = {laser_range}')   
+        print(f'Angle Increment = {laser_angle_increment}')
 
         self.laser_initialized=True
                 
