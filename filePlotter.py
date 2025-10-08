@@ -16,6 +16,11 @@ def plot_errors(filename):
 
     for i in range(0, len(headers) - 1):
         plt.plot(time_list, [lin[i] for lin in values], label= headers[i]+ " linear")
+
+    plt.title(f"Sensor Data Plot: {filename}")
+
+    plt.xlabel("Time [s]")
+    plt.ylabel("Sensor Values")
     
     #plt.plot([lin[0] for lin in values], [lin[1] for lin in values])
     plt.legend()

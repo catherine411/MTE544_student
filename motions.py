@@ -32,7 +32,7 @@ class motion_executioner(Node):
         
         self.type=motion_type
         
-        self.radius_=0.0
+        self.radius_=0.25
         
         self.successful_init=False
         self.imu_initialized=False
@@ -111,13 +111,10 @@ class motion_executioner(Node):
     def laser_callback(self, laser_msg: LaserScan):
         ... # log laser msgs with position msg at that time
         timestamp = Time.from_msg(laser_msg.header.stamp).nanoseconds # timestamp from message header
-        laser_range = laser_msg.ranges
-        laser_angle_increment = laser_msg.angle_increment
-        self.laser_logger.log_values([laser_range, laser_angle_increment, timestamp])
-
-        print(f'\nLaserScan Message Timestamp = {timestamp}')   
-        print(f'Range = {laser_range}')   
-        print(f'Angle Increment = {laser_angle_increment}')
+        stamped_range = list(laser_msg.ranges)
+        stamped_range.append( laser_msg.angle_increment)
+        stamped_range.append(timestamp)
+        self.laser_logger.log_values(stamped_range)
 
         self.laser_initialized=True
                 
@@ -153,24 +150,25 @@ class motion_executioner(Node):
         msg=Twist()
         
         ... # fill up the twist msg for circular motion
-        msg.linear.x = 0.5
-        msg.angular.z = 0.25
+        msg.linear.x = 0.25 * self.radius_
+        msg.angular.z = 0.2
 
         return msg
 
     def make_spiral_twist(self):
         msg=Twist()
         # ... # fill up the twist msg for spiral motion
+        msg.linear.x = 0.1 * self.radius_
+        msg.angular.z = 0.5 
 
-        msg.linear.x = 0.3
-        msg.angular.z = 0.5
+        self.radius_= self.radius_+ 0.025
 
         return msg
     
     def make_acc_line_twist(self):
         msg=Twist()
         ... # fill up the twist msg for line motion
-        msg.linear.x = 0.5
+        msg.linear.x = 0.25
         msg.angular.z = 0.0 
 
         return msg
