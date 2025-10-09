@@ -2,6 +2,8 @@
 # Note that you need to modify/adapt it to your own files
 # Feel free to make any modifications/additions here
 
+import math
+import numpy as np
 import matplotlib.pyplot as plt
 from utilities import FileReader
 
@@ -27,7 +29,7 @@ def plot_errors(filename):
     plt.grid()
     plt.show()
 
-def plot_odom_x_y(filename):
+def plot_odom_x_y(filename): # plot x vs y from odom data
     
     headers, values=FileReader(filename).read_file() 
 
@@ -49,6 +51,44 @@ def plot_odom_x_y(filename):
     plt.legend()
     plt.tight_layout()
     plt.show()
+
+def plot_laser(filename, row_index=0): # plot laser scan for one angle
+    
+    headers, values = FileReader(filename).read_file()
+
+    row = values[row_index] # select one row to plot
+
+    ranges = np.array(row[:-2], dtype=float) # slice off the last two values to get all laser ranges
+    angle_offset = float(row[-2]) # robot/sensor heading at this scan 
+    _timestamp_ns = row[-1] # timestamp in nanoseconds
+
+    n = len(ranges) # should be 360
+    theta_local_deg = np.arange(n, dtype=float)  # array w values 0, 1, 2, ..., 359
+    theta_local = np.deg2rad(theta_local_deg)  # convert to radians     
+
+    theta = theta_local + angle_offset # add offset to every angle
+
+    mask = np.isfinite(ranges) & (ranges > 0.0) # filter out invalid measurements (avoids us having to filter out Infinity values in the future)
+
+    r  = ranges[mask] # removes all values where mask is False
+    th = theta[mask]  # removes all values where mask is False
+
+    x = r * np.cos(th)
+    y = r * np.sin(th)
+
+    plt.figure()
+    plt.scatter(x, y, s=6)
+    plt.scatter([0], [0], s=40, marker='x', label='Sensor')
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.title(f"Laser scan (row {row_index}) — {filename}")
+    plt.xlabel("x [m]")
+    plt.ylabel("y [m]")
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+
     
 import argparse
 
@@ -63,5 +103,6 @@ if __name__=="__main__":
 
     filenames=args.files
     for filename in filenames:
-        #plot_errors(filename)
-        plot_odom_x_y(filename)
+        plot_errors(filename)
+        #plot_odom_x_y(filename)
+        #plot_laser(filename, row_index=0)
