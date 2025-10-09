@@ -12,7 +12,7 @@ def plot_errors(filename):
     first_stamp=values[0][-1]
     
     for val in values:
-        time_list.append(val[-1] - first_stamp)
+        time_list.append((val[-1] - first_stamp) / 1e9) # convert to seconds
 
     for i in range(0, len(headers) - 1):
         plt.plot(time_list, [lin[i] for lin in values], label= headers[i]+ " linear")
