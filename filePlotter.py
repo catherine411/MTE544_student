@@ -26,6 +26,29 @@ def plot_errors(filename):
     plt.legend()
     plt.grid()
     plt.show()
+
+def plot_odom_x_y(filename):
+    
+    headers, values=FileReader(filename).read_file() 
+
+    xs = [row[0] for row in values] # array of x values
+    ys = [row[1] for row in values] # array of y values
+
+    # Plot the path
+    plt.plot(xs, ys, label=filename, linewidth=1.6)
+    # Mark start/end
+    plt.scatter(xs[0], xs[0], s=0)  # harmless; prevents legend warning on empty scatter
+    plt.scatter(xs[0], ys[0], s=30, marker="o", label=f"{filename} start")
+    plt.scatter(xs[-1], ys[-1], s=30, marker="x", label=f"{filename} end")
+
+    plt.title(f"Robot Trajectory (x vs y): {filename}")
+    plt.xlabel("x [m]")
+    plt.ylabel("y [m]")
+    plt.axis("equal")      # preserve geometry
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
     
 import argparse
 
@@ -40,4 +63,5 @@ if __name__=="__main__":
 
     filenames=args.files
     for filename in filenames:
-        plot_errors(filename)
+        #plot_errors(filename)
+        plot_odom_x_y(filename)
