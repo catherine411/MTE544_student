@@ -94,8 +94,6 @@ def euler_from_quaternion(quat):
     q_z = quat[2]
     q_w = quat[3]
 
-    # roll =  atan2(2.0 * (q_w * q_x + q_y * q_z), 1.0 - 2.0 * (q_x**2 + q_y**2))
-    # pitch = asin(2.0 * (q_w * q_y - q_z * q_x))
     yaw = atan2(2.0 * (q_w * q_z + q_x * q_y), 1.0 - 2.0 * (q_y**2 + q_z**2))
     
     ... # just unpack yaw

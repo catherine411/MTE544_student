@@ -46,7 +46,7 @@ def plot_odom_x_y(filename): # plot x vs y from odom data
     plt.title(f"Robot Trajectory (x vs y): {filename}")
     plt.xlabel("x [m]")
     plt.ylabel("y [m]")
-    plt.axis("equal")      # preserve geometry
+    plt.axis("equal")
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
@@ -68,10 +68,10 @@ def plot_laser(filename, row_index=0): # plot laser scan for one angle
 
     theta = theta_local + angle_offset # add offset to every angle
 
-    mask = np.isfinite(ranges) & (ranges > 0.0) # filter out invalid measurements (avoids us having to filter out Infinity values in the future)
+    mask = np.isfinite(ranges) & (ranges > 0.0) # filter out invalid measurements
 
-    r  = ranges[mask] # removes all values where mask is False
-    th = theta[mask]  # removes all values where mask is False
+    r  = ranges[mask]
+    th = theta[mask] 
 
     x = r * np.cos(th)
     y = r * np.sin(th)

@@ -18,8 +18,6 @@ from nav_msgs.msg import Odometry
 from rclpy.time import Time
 
 # You may add any other imports you may need/want to use below
-# import ...
-
 
 CIRCLE=0; SPIRAL=1; ACC_LINE=2
 motion_types=['circle', 'spiral', 'line']
@@ -40,6 +38,7 @@ class motion_executioner(Node):
         self.laser_initialized=False
         
         # TODO Part 3: Create a publisher to send velocity commands by setting the proper parameters in (...)
+        # Publishes velocity commands to '/cmd_vel' topic
         self.vel_publisher=self.create_publisher(Twist, '/cmd_vel', 10)
 
         # initialize lists
@@ -54,16 +53,16 @@ class motion_executioner(Node):
         
         # TODO Part 3: Create the QoS profile by setting the proper parameters in (...)
         # Define a QoS Profile for the subscriber
-        qos=QoSProfile(reliability=2, durability=2, history=1, depth=10) # adjust if needed
+        qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
 
         # TODO Part 5: Create below the subscription to the topics corresponding to the respective sensors
-        # IMU subscription
+        # IMU subscription, subscribes to '/imu' topic
         self.create_subscription(Imu, '/imu', self.imu_callback, qos_profile=qos)
         
-        # ENCODER subscription
+        # ENCODER subscription, subscribes to '/odom' topic
         self.create_subscription(Odometry, '/odom', self.odom_callback, qos_profile=qos)
         
-        # LaserScan subscription
+        # LaserScan subscription, subscribes to '/scan' topic
         self.create_subscription(LaserScan, '/scan', self.laser_callback, qos_profile=qos)
         
         self.create_timer(0.1, self.timer_callback)
@@ -76,7 +75,7 @@ class motion_executioner(Node):
     # You can save the needed fields into a list, and pass the list to the log_values function in utilities.py
 
     def imu_callback(self, imu_msg: Imu):
-        ...    # log imu msgs
+        # log imu msgs, x and y acceleration and angular velocity at each timestamp
         timestamp = Time.from_msg(imu_msg.header.stamp).nanoseconds
         imu_acc_x = imu_msg.linear_acceleration.x
         imu_acc_y = imu_msg.linear_acceleration.y
@@ -93,8 +92,8 @@ class motion_executioner(Node):
 
         
     def odom_callback(self, odom_msg: Odometry):
-        ... # log odom msgs
-        timestamp = Time.from_msg(odom_msg.header.stamp).nanoseconds # timestamp from message header
+        # log odom msgs, x, y, and orientation (converted to euler) at each timestamp
+        timestamp = Time.from_msg(odom_msg.header.stamp).nanoseconds
         odom_x_pos = odom_msg.pose.pose.position.x
         odom_y_pos = odom_msg.pose.pose.position.y
         odom_orientation = euler_from_quaternion([odom_msg.pose.pose.orientation.x, odom_msg.pose.pose.orientation.y, odom_msg.pose.pose.orientation.z, odom_msg.pose.pose.orientation.w])
@@ -109,8 +108,8 @@ class motion_executioner(Node):
         self.odom_initialized=True
                 
     def laser_callback(self, laser_msg: LaserScan):
-        ... # log laser msgs with position msg at that time
-        timestamp = Time.from_msg(laser_msg.header.stamp).nanoseconds # timestamp from message header
+        # log laser msgs, ranges and angle increment at each timestamp
+        timestamp = Time.from_msg(laser_msg.header.stamp).nanoseconds
         stamped_range = list(laser_msg.ranges)
         stamped_range.append( laser_msg.angle_increment)
         stamped_range.append(timestamp)
@@ -149,7 +148,8 @@ class motion_executioner(Node):
     def make_circular_twist(self):
         msg=Twist()
         
-        ... # fill up the twist msg for circular motion
+        # Set linear and angular velocity for circular motion
+        # angular velocity > linear velocity for circular motion
         msg.linear.x = 0.25 * self.radius_
         msg.angular.z = 0.2
 
@@ -157,17 +157,21 @@ class motion_executioner(Node):
 
     def make_spiral_twist(self):
         msg=Twist()
-        # ... # fill up the twist msg for spiral motion
+
+        # Set linear and angular velocity for spiral outward motion
         msg.linear.x = 0.1 * self.radius_
         msg.angular.z = 0.5 
 
+        # Increase radius incrementally for spiral outward motion
         self.radius_= self.radius_+ 0.025
 
         return msg
     
     def make_acc_line_twist(self):
         msg=Twist()
-        ... # fill up the twist msg for line motion
+        
+        # Set linear and angular velocity for line motion
+        # No angular velocity for linear motion
         msg.linear.x = 0.25
         msg.angular.z = 0.0 
 
