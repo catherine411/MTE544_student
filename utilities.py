@@ -1,7 +1,5 @@
 from math import atan2, asin, sqrt
 
-# from tf_transformations import euler_from_quaternion
-
 M_PI=3.1415926535
 
 class Logger:
@@ -25,13 +23,16 @@ class Logger:
         with open(self.filename, 'a') as file:
             vals_str=""
 
-            # TODO Part 5: Write the values from the list to the file
+            # Part 5: Write the values from the list to the file
+
+            # Appends sensor values/corresponding timestamps to list
             for val in values_list:
                 vals_str+=str(val)
                 vals_str+=', '
             
             vals_str+="\n"
             
+            # Logs each line to CSV file
             file.write(vals_str)
             
 
@@ -83,7 +84,7 @@ class FileReader:
         return headers, table
 
 
-# TODO Part 5: Implement the conversion from Quaternion to Euler Angles
+# Part 5: Implement the conversion from Quaternion to Euler Angles
 def euler_from_quaternion(quat):
     """
     Convert quaternion (w in last place) to euler roll, pitch, yaw.
@@ -94,9 +95,11 @@ def euler_from_quaternion(quat):
     q_z = quat[2]
     q_w = quat[3]
 
+    # quaterion to euler conversion, returns only yaw
+    # roll =  atan2(2.0 * (q_w * q_x + q_y * q_z), 1.0 - 2.0 * (q_x**2 + q_y**2))
+    # pitch = asin(2.0 * (q_w * q_y - q_z * q_x))
     yaw = atan2(2.0 * (q_w * q_z + q_x * q_y), 1.0 - 2.0 * (q_y**2 + q_z**2))
     
-    ... # just unpack yaw
     return yaw
 
 

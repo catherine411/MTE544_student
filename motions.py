@@ -6,7 +6,7 @@ from rclpy.node import Node
 from utilities import Logger, euler_from_quaternion
 from rclpy.qos import QoSProfile
 
-# TODO Part 3: Import message types needed: 
+# Part 3: Import message types needed: 
     # For sending velocity commands to the robot: Twist
     # For the sensors: Imu, LaserScan, and Odometry
 # Check the online documentation to fill in the lines below
@@ -17,7 +17,6 @@ from nav_msgs.msg import Odometry
 
 from rclpy.time import Time
 
-# You may add any other imports you may need/want to use below
 
 CIRCLE=0; SPIRAL=1; ACC_LINE=2
 motion_types=['circle', 'spiral', 'line']
@@ -37,7 +36,7 @@ class motion_executioner(Node):
         self.odom_initialized=False
         self.laser_initialized=False
         
-        # TODO Part 3: Create a publisher to send velocity commands by setting the proper parameters in (...)
+        # Part 3: Create a publisher to send velocity commands by setting the proper parameters
         # Publishes velocity commands to '/cmd_vel' topic
         self.vel_publisher=self.create_publisher(Twist, '/cmd_vel', 10)
 
@@ -51,11 +50,11 @@ class motion_executioner(Node):
         self.odom_logger=Logger('odom_content_'+str(motion_types[motion_type])+'.csv', headers=["x","y","th", "stamp"])
         self.laser_logger=Logger('laser_content_'+str(motion_types[motion_type])+'.csv', headers=["ranges", "angle_increment", "stamp"])
         
-        # TODO Part 3: Create the QoS profile by setting the proper parameters in (...)
+        # Part 3: Create the QoS profile by setting the proper parameters
         # Define a QoS Profile for the subscriber
         qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
 
-        # TODO Part 5: Create below the subscription to the topics corresponding to the respective sensors
+        # Part 5: Create below the subscription to the topics corresponding to the respective sensors
         # IMU subscription, subscribes to '/imu' topic
         self.create_subscription(Imu, '/imu', self.imu_callback, qos_profile=qos)
         
@@ -68,7 +67,7 @@ class motion_executioner(Node):
         self.create_timer(0.1, self.timer_callback)
 
 
-    # TODO Part 5: Callback functions: complete the callback functions of the three sensors to log the proper data.
+    # Part 5: Callback functions: complete the callback functions of the three sensors to log the proper data.
     # To also log the time you need to use the rclpy Time class, each ros msg will come with a header, and then
     # inside the header you have a stamp that has the time in seconds and nanoseconds, you should log it in nanoseconds as 
     # such: Time.from_msg(imu_msg.header.stamp).nanoseconds
@@ -143,7 +142,7 @@ class motion_executioner(Node):
         self.vel_publisher.publish(cmd_vel_msg)
         
     
-    # TODO Part 4: Motion functions: complete the functions to generate the proper messages corresponding to the desired motions of the robot
+    # Part 4: Motion functions: complete the functions to generate the proper messages corresponding to the desired motions of the robot
 
     def make_circular_twist(self):
         msg=Twist()
@@ -170,8 +169,7 @@ class motion_executioner(Node):
     def make_acc_line_twist(self):
         msg=Twist()
         
-        # Set linear and angular velocity for line motion
-        # No angular velocity for linear motion
+        # Set linear velocity and no angular velocity for line motion
         msg.linear.x = 0.25
         msg.angular.z = 0.0 
 
