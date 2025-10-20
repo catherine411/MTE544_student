@@ -72,9 +72,15 @@ class decision_maker(Node):
         
         # TODO Part 3: Check if you reached the goal
         if type(self.goal) == list:
-            reached_goal=...
+            # For point planner or trajectory waypoints
+            final_point = self.goal[-1]  # last point in the trajectory
+            dist = calculate_linear_error(self.localizer.getPose(), final_point)
+            reached_goal = dist < 0.1  # 10 cm threshold
+        
         else: 
-            reached_goal=...
+            # If self.goal is a single point (not a list)
+            dist = calculate_linear_error(self.localizer.getPose(), self.goal)
+            reached_goal = dist < 0.1
         
 
         if reached_goal:
@@ -85,12 +91,15 @@ class decision_maker(Node):
             self.controller.PID_linear.logger.save_log()
             
             #TODO Part 3: exit the spin
-            ... 
+            raise SystemExit 
         
         velocity, yaw_rate = self.controller.vel_request(self.localizer.getPose(), self.goal, True)
+        # Part 4: Get velocity commands from controller
+        vel_msg.linear.x = velocity
+        vel_msg.angular.z = yaw_rate
 
         #TODO Part 4: Publish the velocity to move the robot
-        ... 
+        self.publisher.publish(vel_msg) 
 
 import argparse
 
@@ -107,9 +116,9 @@ def main(args=None):
 
     # TODO Part 4: instantiate the decision_maker with the proper parameters for moving the robot
     if args.motion.lower() == "point":
-        DM=decision_maker(...)
+        DM=decision_maker(Twist, "/cmd_vel", odom_qos, goalPoint=[1.0, 1.0], rate=10, motion_type=POINT_PLANNER)
     elif args.motion.lower() == "trajectory":
-        DM=decision_maker(...)
+        DM=decision_maker(Twist, "/cmd_vel", odom_qos, goalPoint=[1.0, 1.0], rate=10, motion_type=TRAJECTORY_PLANNER)
     else:
         print("invalid motion type", file=sys.stderr)        
     
