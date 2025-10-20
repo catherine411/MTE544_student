@@ -30,8 +30,17 @@ class controller:
         
         # TODO Part 4: Add saturation limits for the robot linear and angular velocity (hint: you can use np.clip function)
 
-        linear_vel = ... 
-        angular_vel= ... 
+        # max_linear_vel = 0.31       # m/s (from datasheet for TutleBot 4) 
+        # max_angular_vel = 1.90      # rad/s (from datasheet for TutleBot 4)
+
+        max_linear_vel = 0.22       # m/s (from datasheet for Burger sim) 
+        max_angular_vel = 2.84      # rad/s (from datasheet for Burger sim)
+
+        # Saturate linear velocity within [-0.22, 0.22]
+        linear_vel = max_linear_vel if linear_vel > max_linear_vel else (-max_linear_vel if linear_vel < -max_linear_vel else linear_vel)
+
+        # Saturate angular velocity within [-2.84, 2.84]
+        angular_vel = max_angular_vel if angular_vel > max_angular_vel else (-max_angular_vel if angular_vel < -max_angular_vel else angular_vel)
         
         return linear_vel, angular_vel
     
@@ -57,8 +66,12 @@ class trajectoryController(controller):
 
         # TODO Part 5: Add saturation limits for the robot linear and angular velocity (hint: you can use np.clip function)
 
-        linear_vel = ... 
-        angular_vel= ... 
+        linear_vel = np.clip(linear_vel, -0.22, 0.22) # m/s (from datasheet for Burger sim) 
+        angular_vel = np.clip(angular_vel, -2.84, 2.84) # rad/s (from datasheet for Burger sim)
+        #linear_vel = np.clip(linear_vel, -0.31, 0.31) # m/s (from datasheet for TutleBot 4) 
+        #angular_vel = np.clip(angular_vel, -1.90, 1.90) # rad/s (from datasheet for TutleBot 4)
+        
+
         
         return linear_vel, angular_vel
 
