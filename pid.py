@@ -1,8 +1,10 @@
 from rclpy.time import Time
 from utilities import Logger
 
+from builtin_interfaces.msg import Time as TimeMsg
+
 # Controller type
-P=0 # poportional
+P=0 # poportional --> try to tune in simulation
 PD=1 # proportional and derivative
 PI=2 # proportional and integral
 PID=3 # proportional, integral, derivative
@@ -55,8 +57,8 @@ class PID_ctrl:
         
         for i in range(1, len(self.history)):
             
-            t0=Time.from_msg(self.history[i-1][1])
-            t1=Time.from_msg(self.history[i][1])
+            t0 = self.history[i-1][1] if isinstance(self.history[i-1][1], Time) else Time(nanoseconds=int(self.history[i-1][1]))
+            t1 = self.history[i][1] if isinstance(self.history[i][1], Time) else Time(nanoseconds=int(self.history[i][1]))
             
             dt=(t1.nanoseconds - t0.nanoseconds) / 1e9
             
@@ -102,5 +104,5 @@ class PID_ctrl:
         
         elif self.type == PID:
             pass
-             return self.kp * latest_error + self.ki * error_int + self.kv * error_dot
+            return self.kp * latest_error + self.ki * error_int + self.kv * error_dot
             # return ... # complete
