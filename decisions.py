@@ -37,12 +37,27 @@ class decision_maker(Node):
         # TODO Part 5: Tune your parameters here
     
         if motion_type == POINT_PLANNER:
-            self.controller=controller(klp=0.7, klv=0.5, kap=0.8, kav=0.6)
+            # params P point
+            # before (default): self.controller=controller(klp=0.2, klv=0.5, kap=0.8, kav=0.6)
+            # self.controller=controller(klp=0.4, klv=0.5, kap=0.8, kav=0.6)
+
+            # params PID point
+            # self.controller=controller(klp=0.4, klv=0.5, kap=0.9, kav=0.6)
+
+            self.controller=controller(klp=0.4, klv=0.5, kap=0.9, kav=0.6)
+                # def __init__(self, klp=0.2, klv=0.2, kli=0.2, kap=0.2, kav=0.2, kai=0.2):
+                #    self.PID_linear=PID_ctrl(PID, klp, klv, kli, filename_="linear.csv")
             self.planner=planner(POINT_PLANNER)
     
     
         elif motion_type==TRAJECTORY_PLANNER:
-            self.controller=trajectoryController(klp=0.2, klv=0.5, kap=0.8, kav=0.6)
+            # params for PID parabola
+            # self.controller=trajectoryController(klp=0.2, klv=0.5, kap=0.8, kav=0.6)
+
+            # params for PID sigmoid
+            # self.controller=trajectoryController(klp=0.4, klv=0.5, kap=0.9, kav=0.6)
+            # params for PID sigmoid, deafult before tuning           
+            # self.controller=trajectoryController(klp=0.2, klv=0.5, kap=0.8, kav=0.6)
             self.planner=planner(TRAJECTORY_PLANNER)
 
         else:
