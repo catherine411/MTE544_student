@@ -18,12 +18,38 @@ class particle:
         w: angular velocity
         dt: time step
         """
-        self.pose[0] += ...
-        self.pose[1] += ...
-        self.pose[2] += ...
+        
+        # Standard differential-drive motion model
+        # For small angular velocity, approximate straight motion
+        if abs(w) < 1e-6:
+            self.pose[0] += v * cos(self.pose[2]) * dt
+            self.pose[1] += v * sin(self.pose[2]) * dt
+        else:
+            self.pose[0] += (-v / w) * sin(self.pose[2]) + (v / w) * sin(self.pose[2] + w * dt)
+            self.pose[1] += (v / w) * cos(self.pose[2]) - (v / w) * cos(self.pose[2] + w * dt)
+        self.pose[2] += w * dt
+        # Keep theta within [-pi, pi]
+        self.pose[2] = np.arctan2(np.sin(self.pose[2]), np.cos(self.pose[2]))
+
+
+        #self.pose[0] += ...
+        #self.pose[1] += ...
+        #self.pose[2] += ...
+
+
+
 
     # TODO: You need to explain the following function to TA
     def calculateParticleWeight(self, scanOutput: LaserScan, mapManipulatorInstance: mapManipulator, laser_to_ego_transformation: np.array):
+        """
+        This function evaluates how well this particle’s pose explains the actual laser scan.
+        1. Transform all laser endpoints from the robot frame into the map frame.
+        2. Convert those endpoints into map cell coordinates.
+        3. For each valid cell, read its likelihood value (probability of being near an obstacle)
+           from the precomputed likelihood field.
+        4. Multiply (log-sum) all those likelihoods → particle’s total likelihood (weight).
+        """
+
 
         T = np.matmul(self.__poseToTranslationMatrix(), laser_to_ego_transformation)
 

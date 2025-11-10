@@ -168,6 +168,20 @@ class mapManipulator(Node):
         return (np.array(np.floor((-origin + pos_array)/res), dtype=np.int32)) - np.array([0, h])
 
     # TODO part 4: See through this method and explain how it works to the TA
+    #EXPLAIN FOR TA
+    #Computes a diatance based likelihood field from obstacles
+    #Resulting in the probability that a laser beam endpoint falls near an obstacle
+    #First it finds all occupied cells, black pixels <10 in intensity
+    #This uses a KDTree to find nearest obstacle for every cell
+    #Calculating the euclidean distance to closest occupied cell for every map cell  
+    #Converting the distance to probability using Gaussian model
+    #Computes p(z|x) = exp((-d^2)/2sigma^2)
+    #d is distance to nearest obstacle
+    #sigma is laser_sig
+    #probability map used in weighting each particle
+    #Cells near obstacle get high likelihood, and far get low
+    #The 2D array likelihood_field is used by each particle to estimate the consistency of the scan within the map
+    
     def make_likelihood_field(self):
         
         image_array=self.image_array
