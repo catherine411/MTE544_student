@@ -20,16 +20,21 @@ class particle:
         """
         
         # Standard differential-drive motion model
-        # For small angular velocity, approximate straight motion
-        if abs(w) < 1e-6:
-            self.pose[0] += v * cos(self.pose[2]) * dt
-            self.pose[1] += v * sin(self.pose[2]) * dt
-        else:
-            self.pose[0] += (-v / w) * sin(self.pose[2]) + (v / w) * sin(self.pose[2] + w * dt)
-            self.pose[1] += (v / w) * cos(self.pose[2]) - (v / w) * cos(self.pose[2] + w * dt)
+
+        self.pose[0] += (-v / w) * sin(self.pose[2]) + (v / w) * sin(self.pose[2] + w * dt)
+        self.pose[1] += (v / w) * cos(self.pose[2]) - (v / w) * cos(self.pose[2] + w * dt)
         self.pose[2] += w * dt
-        # Keep theta within [-pi, pi]
-        self.pose[2] = np.arctan2(np.sin(self.pose[2]), np.cos(self.pose[2]))
+
+        # For small angular velocity, approximate straight motion
+        # if abs(w) < 1e-6:
+        #     self.pose[0] += v * cos(self.pose[2]) * dt
+        #     self.pose[1] += v * sin(self.pose[2]) * dt
+        # else:
+        #     self.pose[0] += (-v / w) * sin(self.pose[2]) + (v / w) * sin(self.pose[2] + w * dt)
+        #     self.pose[1] += (v / w) * cos(self.pose[2]) - (v / w) * cos(self.pose[2] + w * dt)
+        # self.pose[2] += w * dt
+        # # Keep theta within [-pi, pi]
+        # self.pose[2] = np.arctan2(np.sin(self.pose[2]), np.cos(self.pose[2]))
 
 
         #self.pose[0] += ...
