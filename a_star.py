@@ -3,6 +3,24 @@ import matplotlib.pyplot as plt
 from math import sqrt
 
 
+"""
+Manhattan heuristic function calculates the straight line distance between 
+2 points and measures the total number of horizontal and vertical steps to 
+travel with no diagonal movements, grid based
+underestimates the actual cost if diagonal moves are allowed
+accurate for strict 4-direction movement, up, down, left, right only
+"""
+
+"""
+Euclidean heuristic function calculates the straight line distance between
+2 points using the pythagorean theorem/Euclidean distance
+Accurate for continuous movement, can move vertically, horizontally 
+and diagonally, good for 8 grid
+never overestimates, ensuring optimality of A*
+"""
+#SIMPLE HEURISTIC SWITCH
+USE_MANHATTAN = False      # Set True for Manhattan, False for Euclidean
+
 class Node:
     """
         A node class for A* Pathfinding
@@ -46,6 +64,14 @@ def return_path(current_node, maze):
 
     return path
 
+def heuristic(a, b):
+    #function to compute either Euclidean or Manhattan distance.
+    if USE_MANHATTAN:
+        return abs(a[0] - b[0]) + abs(a[1] - b[1])      # Manhattan
+    else:
+        return sqrt((a[0] - b[0])**2 + (a[1] - b[1])**2)  # Euclidean
+
+
 
 def search(maze, start, end):
     maze = maze.copy().T
@@ -72,6 +98,7 @@ def search(maze, start, end):
     
     # TODO PART 4 Create start and end node with initized values for g, h and f
     # Use None as parent if not defined
+    """
     start_node = Node(...)
     start_node.g = ...     # cost from start Node
     start_node.h = ...     # heuristic estimated cost to end Node
@@ -81,11 +108,38 @@ def search(maze, start, end):
     end_node.g = ...       # set a large value if not defined
     end_node.h = ...       # heuristic estimated cost to end Node
     end_node.f = ...
+    """
+
+    start_node = Node(None, start)  #None at the beginning
+    start_node.g = 0     # cost from start Node
+    start_node.h = heuristic(start, end)  # Manhattan or Euclidean heuristic function    
+    start_node.f = start_node.g + start_node.h
+
+    end_node = Node(None, end)
+    end_node.g = float("inf")       # set a large value if not defined
+    end_node.h = 0       # heuristic estimated cost to end Node itself
+    end_node.f = 0
+
+    """ HOW TO SELECT NEXT NODE TO EXPAND
+    Each iteration A* selects the node with lowest f value in 
+    “yet_to_visit” dictionary. 
+    
+    Why A star is more efficient than Dijkstra's algorithm.
+    Selecting most promising path first
+    reducing unnecessary exploration compared to Dijkstra's algorithm
+    that only considers g (DIST FROM START, explores all paths equally).
+    even furthest ones
+
+    A* explores paths that are promising, lowest cost, expands less nodes
+    than D, reducing computation time and memory
+
+
+    """
 
     # Initialize both yet_to_visit and visited dictionary
     # in this dict we will put all node that are yet_to_visit for exploration.
     # From here we will find the lowest cost node to expand next
-    yet_to_visit_dict = {}  # key is the position (tuple), value is the node
+    yet_to_visit_dict = {start_node.position: start_node}  # key is the position (tuple), value is the node
     # in this list we will put all node those already explored so that we don't explore it again
     # key is the position (tuple), value is True (boolean)
     visited_dict = {}
@@ -140,8 +194,10 @@ def search(maze, start, end):
         current_fscore = None
         for position, node in yet_to_visit_dict.items():
             if current_fscore is None or node.f < current_fscore:
-                current_fscore = ...
-                current_node = ...
+                #current_fscore = ...
+                #current_node = ...
+                current_fscore = node.f
+                current_node = node
 
         # if we hit this point return the path such as it may be no solution or
         # computation cost is too high
@@ -167,7 +223,9 @@ def search(maze, start, end):
             node_position = (current_node.position[0] + new_position[0], current_node.position[1] + new_position[1])
 
             # TODO PART 4 Make sure within range (check if within maze boundary)
-            if (...):
+            #if (...):
+            if (node_position[0] < 0 or node_position[0] >= no_rows or
+            node_position[1] < 0 or node_position[1] >= no_columns):
                 continue
 
             # Make sure walkable terrain
@@ -185,13 +243,29 @@ def search(maze, start, end):
         for child in children:
 
             # TODO PART 4 Child is on the visited dict (use get method to check if child is in visited dict, if not found then default value is False)
-            if ():
+            #if ():
+            if (visited_dict.get(child.position, False)):
                 continue
 
             # TODO PART 4 Create the f, g, and h values
-            child.g = ...
+
+            """
+            cost function g: cost to reach n from start
+            distance travelled so far, actual path
+
+            cost function h: heuristic estimation of 
+            cost from node n to goal
+            biased to goal
+
+            cost function f: Total estimated cost of path through n
+            exploration and goal direction considered
+            """
+
+            #child.g = ...
+            child.g = current_node.g + 1
             # Heuristic costs calculated here, this is using eucledian distance
-            child.h = ...
+            #child.h = ...
+            child.h = heuristic(child.position, end)
 
             child.f = child.g + child.h
 
